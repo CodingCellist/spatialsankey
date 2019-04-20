@@ -150,17 +150,18 @@ d3.spatialsankey = function() {
           dy = source.y - target.y;
 
       // Determine control point locations for different link styles
-      if(!arcs){
-        if(dy < 0 || flip){
-          let controls = [sx*dx, sy*dy, sx*dx, sy*dy]
+      let controls;
+      if (!arcs) {
+        if (dy < 0 || flip) {
+          controls = [sx * dx, sy * dy, sx * dx, sy * dy]
         } else {
-          let controls = [sy*dx, sx*dy, sy*dx, sx*dy]
+          controls = [sy * dx, sx * dy, sy * dx, sx * dy]
         }
-      } else  {
-        if(dy < 0 || flip){
-          let controls = [sx*dx, sy*dy, sy*dx, sx*dy];
+      } else {
+        if (dy < 0 || flip) {
+          controls = [sx * dx, sy * dy, sy * dx, sx * dy];
         } else {
-          let controls = [sy*dx, sx*dy, sx*dx, sy*dy];
+          controls = [sy * dx, sx * dy, sx * dx, sy * dy];
         }
       }
 
@@ -196,7 +197,7 @@ d3.spatialsankey = function() {
     // Range of node circles (set min and max equal for constant circle size)
     const node_radius_range = {min: 10, max: 20};
     // Range for color coding according to flow size (set colors for single coloring)
-    const node_color_range = ["yellow", "red"];
+    const node_color_range = ["#00aeef", "#00aeef"];
     // Customize link styles using options
     if(options){
       if(options.minradius) node_radius_range.min = options.minradius;

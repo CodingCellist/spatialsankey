@@ -25,9 +25,13 @@ d3.spatialsankey = function() {
     if (!arguments.length) return nodes;
     nodes = _;
     // Reduce data to feature list
-    if(nodes.features) nodes = nodes.features;
+    if (nodes.features) nodes = nodes.features;
     // GeoJson uses lon/lat, leaflet uses lat/lon, so coordinates need to be reversed
-    nodes.forEach(function(d){d.geometry.coordinates.reverse();})
+    nodes.forEach(function(d) {
+      d.geometry
+          .coordinates
+          .reverse();
+    });
     return spatialsankey;
   };
 
@@ -43,8 +47,10 @@ d3.spatialsankey = function() {
     // Calculate aggregate flow values for nodes
     nodes = nodes.map(function(node) {
       // Get all in and outflows to this node
-      var inflows = links.filter(function(link) { return link.target == node.id; });
-      var outflows = links.filter(function(link) { return link.source == node.id; });
+      let inflows = links.filter(function(link) {
+        return link.target == node.id;
+      });
+      let outflows = links.filter(function(link) { return link.source == node.id; });
 
       // Sum flows and set aggregate values
       node.properties.aggregate_inflows = inflows.reduce(function(memo, link) { return memo + link.flow; }, 0);
@@ -58,7 +64,7 @@ d3.spatialsankey = function() {
     link_flow_range.max = d3.max(links, function(link) { return link.flow; });
 
     node_flow_range.min = d3.min(nodes, function(node) {
-      var inflow = node.properties.aggregate_outflows;
+      let inflow = node.properties.aggregate_outflows;
       return inflow == 0 ? null : inflow;
     });
     node_flow_range.max = d3.max(nodes, function(node) { return node.properties.aggregate_outflows; });
@@ -74,7 +80,7 @@ d3.spatialsankey = function() {
     links = links.map(function(link){
 
       // Get target and source features
-      var source_feature = nodes.filter(function(node) { return node.id == link.source; })[0],
+      let source_feature = nodes.filter(function(node) { return node.id == link.source; })[0],
           target_feature = nodes.filter(function(node) { return node.id == link.target; })[0];
 
       // If nodes were not found, return null
@@ -85,7 +91,7 @@ d3.spatialsankey = function() {
       link.target_coords = target_feature.geometry.coordinates;
 
       // If a flow for this link was specified, set flow value
-      var flow = flows.filter(function(flow) { return flow.id == link.id; })[0];
+      let flow = flows.filter(function(flow) { return flow.id == link.id; })[0];
       if (flow) {
         link.flow = flow.flow;
       }
@@ -114,31 +120,31 @@ d3.spatialsankey = function() {
     
     // Link styles
     // x and y shifts for control points
-    var sx = 0.4,
+    let sx = 0.4,
         sy = 0.1;
     // With range of lines, set min and max to be equal for a constant width.
-    var width_range = {min: 1, max: 8};
+    const width_range = {min: 1, max: 8};
     // If true, links are only shown if there is a flow value for them
-    var hide_zero_flows = true;
+    let hide_zero_flows = true;
     // Use arcs instead of S shaped bezier curves
-    var arcs = false;
+    let arcs = false;
     // If true, lines are flipped along x axis
-    var flip = false;
+    let flip = false;
 
     // Customize link styles using options
-    if(options){
-      if(options.xshift) sx = options.xshift;
-      if(options.yshift) sy = options.yshift;
-      if(options.minwidth) width_range.min = options.minwidth;
-      if(options.maxwidth) width_range.max = options.maxwidth;
-      if(options.use_arcs) arcs = options.use_arcs;
-      if(options.flip) flip = options.flip;
+    if (options) {
+      if (options.xshift) sx = options.xshift;
+      if (options.yshift) sy = options.yshift;
+      if (options.minwidth) width_range.min = options.minwidth;
+      if (options.maxwidth) width_range.max = options.maxwidth;
+      if (options.use_arcs) arcs = options.use_arcs;
+      if (options.flip) flip = options.flip;
     }
 
     // Define path drawing function
-    var link = function(d) {
+    let link = function(d) {
       // Set control point inputs
-      var source = map.latLngToLayerPoint(d.source_coords),
+      let source = map.latLngToLayerPoint(d.source_coords),
           target = map.latLngToLayerPoint(d.target_coords),
           dx = source.x - target.x,
           dy = source.y - target.y;
@@ -146,15 +152,15 @@ d3.spatialsankey = function() {
       // Determine control point locations for different link styles
       if(!arcs){
         if(dy < 0 || flip){
-          var controls = [sx*dx, sy*dy, sx*dx, sy*dy]
+          let controls = [sx*dx, sy*dy, sx*dx, sy*dy]
         } else {
-          var controls = [sy*dx, sx*dy, sy*dx, sx*dy]
+          let controls = [sy*dx, sx*dy, sy*dx, sx*dy]
         }
       } else  {
         if(dy < 0 || flip){
-          var controls = [sx*dx, sy*dy, sy*dx, sx*dy];
+          let controls = [sx*dx, sy*dy, sy*dx, sx*dy];
         } else {
-          var controls = [sy*dx, sx*dy, sx*dx, sy*dy];
+          let controls = [sy*dx, sx*dy, sx*dx, sy*dy];
         }
       }
 
@@ -165,13 +171,13 @@ d3.spatialsankey = function() {
     };
 
     // Calculate width based on data range and width range setting
-    var width = function(d) {
+    let width = function(d) {
           // Don't draw flows with zero flow unless zero is the minimum
           if(d.flow == 0 && link_flow_range.min != 0) return 0;
           // Calculate width value based on flow range
-          var diff = d.flow - link_flow_range.min,
+          let diff = d.flow - link_flow_range.min,
               range = link_flow_range.max - link_flow_range.min;
-          return (width_range.max - width_range.min)*(diff/range) + width_range.min;
+          return (width_range.max - width_range.min) * (diff / range) + width_range.min;
         };
     
     // Get or set link width function
@@ -188,9 +194,9 @@ d3.spatialsankey = function() {
   spatialsankey.node = function(options){
     // Node styles
     // Range of node circles (set min and max equal for constant circle size)
-    var node_radius_range = {min: 10, max: 20};
+    const node_radius_range = {min: 10, max: 20};
     // Range for color coding according to flow size (set colors for single coloring)
-    node_color_range = ["yellow", "red"];
+    const node_color_range = ["yellow", "red"];
     // Customize link styles using options
     if(options){
       if(options.minradius) node_radius_range.min = options.minradius;
@@ -200,12 +206,10 @@ d3.spatialsankey = function() {
     }
 
     // Instantiate color scale function after checking options
-    var color = d3.scale.linear()
-                  .domain([0, 1])
-                  .range(node_color_range);
+    let color = d3.scaleLinear([0, 1], node_color_range);
 
     // Node object
-    var node = {};
+    let node = {};
 
     // Node object properties
     node.cx = function(d) {
@@ -220,7 +224,7 @@ d3.spatialsankey = function() {
     };
     node.r = function(d) {
       if (d.properties.aggregate_outflows == 0) return 0;
-      var diff = d.properties.aggregate_outflows - node_flow_range.min,
+      let diff = d.properties.aggregate_outflows - node_flow_range.min,
           range = node_flow_range.max - node_flow_range.min;
       return (node_radius_range.max - node_radius_range.min)*(diff/range) + node_radius_range.min;
     };
@@ -230,7 +234,7 @@ d3.spatialsankey = function() {
       return node;
     };
     node.fill = function(d) {
-      var diff = d.properties.aggregate_outflows - node_flow_range.min,
+      let diff = d.properties.aggregate_outflows - node_flow_range.min,
           range = node_flow_range.max - node_flow_range.min,
           load = diff/range;
       return color(load);

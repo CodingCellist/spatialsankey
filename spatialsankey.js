@@ -84,7 +84,10 @@ d3.spatialsankey = function() {
           target_feature = nodes.filter(function(node) { return node.id == link.target; })[0];
 
       // If nodes were not found, return null
-      if (!(source_feature && target_feature)) return null;
+      if (!(source_feature && target_feature)) {
+        console.log("Dropped: " + link.source + " --> " + link.target);
+        return null;
+      }
       
       // Set coordinates for source and target      
       link.source_coords = source_feature.geometry.coordinates;
@@ -227,6 +230,7 @@ d3.spatialsankey = function() {
       if (d.properties.aggregate_outflows == 0) return 0;
       let diff = d.properties.aggregate_outflows - node_flow_range.min,
           range = node_flow_range.max - node_flow_range.min;
+      if (range === 0) return node_flow_range.min;
       return (node_radius_range.max - node_radius_range.min)*(diff/range) + node_radius_range.min;
     };
     node.color = function(_) {
